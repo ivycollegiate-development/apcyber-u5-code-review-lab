@@ -21,7 +21,7 @@ VALID_SEVERITIES = {"Critical", "High", "Medium", "Low"}
 VALID_CONFIDENCE = {"High", "Medium", "Low"}
 # Must be verbatim substrings of the reference (unfixed) source
 REFERENCE_SNIPPETS = {
-    "CRV-001": "' + username + '",
+    "CRV-001": "+ username +",
     "CRV-002": "MedP0rt!Prod2026",
     "CRV-003": "pickle.loads",
     "CRV-004": "SELECT * FROM appointments",
