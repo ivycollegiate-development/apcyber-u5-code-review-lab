@@ -7,15 +7,14 @@ rules:
     languages: [python]
 
   - id: python-hardcoded-secret
-    pattern-either:
-      - pattern: $VAR = "sk-live-..."
-      - pattern: $VAR = "..."
+    patterns:
+      - pattern: $VAR = $VALUE
       - metavariable-regex:
           metavariable: $VAR
-          regex: (?i).*(password|api_key|secret).*
+          regex: (?i).*(password|api_key|secret|token).*
       - metavariable-regex:
-          metavariable: $VAR
-          regex: ^sk-live.*
+          metavariable: $VALUE
+          regex: ^[\"'].*[\"']$
     message: Hardcoded secret committed to source (CWE-798)
     severity: ERROR
     languages: [python]
