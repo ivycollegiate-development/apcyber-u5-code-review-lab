@@ -1,0 +1,54 @@
+rules:
+  - id: python-sql-injection-string-concat
+    patterns:
+      - pattern: $DB.execute("..." + $X + "...")
+    message: SQL built with string concatenation - use parameterized queries (CWE-89)
+    severity: ERROR
+    languages: [python]
+
+  - id: python-hardcoded-secret
+    pattern-either:
+      - pattern: $VAR = "sk-live-..."
+      - pattern: $VAR = "..."
+      - metavariable-regex:
+          metavariable: $VAR
+          regex: (?i).*(password|api_key|secret).*
+      - metavariable-regex:
+          metavariable: $VAR
+          regex: ^sk-live.*
+    message: Hardcoded secret committed to source (CWE-798)
+    severity: ERROR
+    languages: [python]
+
+  - id: python-pickle-loads
+    pattern: pickle.loads(...)
+    message: pickle.loads on untrusted input - remote code execution (CWE-502)
+    severity: ERROR
+    languages: [python]
+
+  - id: python-sha1-password
+    pattern: hashlib.sha1(...)
+    message: SHA-1 is too weak for password hashing - use bcrypt/argon2 (CWE-916)
+    severity: WARNING
+    languages: [python]
+
+  - id: python-path-join-user-input
+    pattern-either:
+      - pattern: os.path.join($DIR, $FILENAME)
+      - patterns:
+          - pattern: open(os.path.join($DIR, $FILENAME))
+    message: Path joined with user-controlled filename - path traversal (CWE-22)
+    severity: WARNING
+    languages: [python]
+
+  - id: python-flask-redirect-user-input
+    pattern: redirect($TARGET)
+    message: redirect() with user-controlled target - open redirect (CWE-601)
+    severity: WARNING
+    languages: [python]
+
+  - id: python-traceback-in-response
+    pattern: traceback.format_exc()
+    message: Stack trace exposed in response - information disclosure (CWE-209)
+    severity: WARNING
+    languages: [python]

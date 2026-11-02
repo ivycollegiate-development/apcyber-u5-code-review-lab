@@ -1,0 +1,39 @@
+name: Grade Secure Code Review Lab
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  grade:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install semgrep
+
+      - name: Run Semgrep scan
+        run: |
+          semgrep --config .semgrep.yml scheduler/ --json --output semgrep_results.json || true
+          echo "Semgrep findings:"
+          python -c "import json; r=json.load(open('semgrep_results.json')); print(f'{len(r.get(\"results\", []))} findings')"
+
+      - name: Validate findings.csv
+        run: python tests/validate_findings.py findings_template.csv
+
+      - name: Run regression tests (remediation proof)
+        continue-on-error: true
+        run: python tests/test_remediation.py -v || true
